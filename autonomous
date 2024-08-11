@@ -1,0 +1,207 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@Autonomous(name = "Autonomous3", group = "Examples" )
+public class AutonomousPathWithoutEncoders extends LinearOpMode {
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private DcMotor ms; // Motor without encoder
+    private Servo myServo = null; // New servo
+    private Servo s2 = null;
+    private Servo s3 = null;
+    private static final double MOTOR_RUN_DURATION = 2.0;// Duration in seconds for ms motor rotation
+
+
+    @Override
+    public void runOpMode() {
+        frontLeft = hardwareMap.dcMotor.get("front_Right");
+        frontRight = hardwareMap.dcMotor.get("front_Left");
+        backLeft = hardwareMap.dcMotor.get("back_Right");
+        backRight = hardwareMap.dcMotor.get("back_Left");
+        ms = hardwareMap.get(DcMotor.class, "ms"); // Initialize the new motor
+        myServo = hardwareMap.get(Servo.class, "s1"); // Initialize the new servo
+        s2 = hardwareMap.get(Servo.class, "s2"); // Initialize the new servo
+        s3 = hardwareMap.get(Servo.class, "s3"); // Initialize the new servo
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // Set the initial position for the servo
+        myServo.setPosition(0);
+        s2.setPosition(0);
+        s3.setPosition(0.28);
+        waitForStart();
+
+        // Move forward for a specific time (25 inches)
+        moveStraight(2.5);  // Adjust the time to match 25 inches
+
+        // Turn right for a specific time (90 degrees)
+        turnRight(0.6);  // Adjust the time to match 90 degrees
+
+
+
+        // Start the ms motor and move straight concurrently
+        Thread msThread = new Thread(() -> mse(MOTOR_RUN_DURATION));
+        msThread.start(); // Start the mse method in a separate thread
+
+
+
+
+        moveStraight(3);  // Move forward for 30 inches while ms motor is running
+
+
+        // Start a new thread to move the servo and hold for 3 seconds
+        Thread servoThread = new Thread(() -> moveServoAndHolds1(s2, 0.28, 2));
+        servoThread.start(); // Start the servo movement in a separate thread
+
+        // Start a new thread to move the servo and hold for 3 seconds
+        Thread servoThreads3 = new Thread(() -> moveServoAndHolds2(s3, 0, 2));
+        servoThreads3.start(); // Start the servo movement in a separate thread
+
+        // Start a new thread to move the servo and hold for 3 seconds
+        Thread servoThreads2 = new Thread(() -> moveServoAndHold(myServo, 0.28, 3));
+        servoThreads2.start(); // Start the servo movement in a separate thread
+
+
+        // Start the ms motor and move straight concurrently
+        Thread msrThread = new Thread(() -> msr(MOTOR_RUN_DURATION));
+        msrThread.start(); // Start the mse method in a separate thread
+
+        moveStraight(3);  // Move forward for 30 inches while ms motor is running
+
+        // Turn right for a specific time (90 degrees)
+        turnL(0.8);  // Adjust the time to match 90 degrees
+
+        // Move forward for a specific time (25 inches)
+        moveStraightback(2.5);  // Adjust the time to match 25 inches
+
+        myServo.setPosition(0.28);
+    }
+
+
+    private void moveServoAndHolds2(Servo servo, double position, double holdTimeInSeconds) {
+        // Move the servo to the specified position
+        servo.setPosition(position);
+
+        // Hold the position for the specified time
+        sleep((long) (holdTimeInSeconds * 1000));
+
+        // Optionally, you can move the servo back to the original position or another position
+        // servo.setPosition(0.0);
+    }
+
+    private void moveServoAndHold(Servo servo, double position, double holdTimeInSeconds) {
+        // Move the servo to the specified position
+        servo.setPosition(position);
+
+        // Hold the position for the specified time
+        sleep((long) (holdTimeInSeconds * 1000));
+
+        // Optionally, you can move the servo back to the original position or another position
+        // servo.setPosition(0.0);
+    }
+
+    private void moveServoAndHolds1(Servo servo, double position, double holdTimeInSeconds) {
+        // Move the servo to the specified position
+        servo.setPosition(position);
+
+        // Hold the position for the specified time
+        sleep((long) (holdTimeInSeconds * 1000));
+
+        // Optionally, you can move the servo back to the original position or another position
+        // servo.setPosition(0.0);
+    }
+
+    private void moveStraight(double timeInSeconds) {
+        // Set the power for all motors
+        frontLeft.setPower(0.3);
+        frontRight.setPower(0.3);
+        backLeft.setPower(0.3);
+        backRight.setPower(0.3);
+
+        // Run for the specified time
+        sleep((long) (timeInSeconds * 1000));
+
+        // Stop all motion
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void moveStraightback(double timeInSeconds) {
+        // Set the power for all motors
+        frontLeft.setPower(-0.3);
+        frontRight.setPower(-0.3);
+        backLeft.setPower(-0.3);
+        backRight.setPower(-0.3);
+
+        // Run for the specified time
+        sleep((long) (timeInSeconds * 1000));
+
+        // Stop all motion
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void turnRight(double timeInSeconds) {
+        // Set power for a right turn (left side forward, right side backward)
+        frontLeft.setPower(0.5);
+        frontRight.setPower(-0.5);
+        backLeft.setPower(0.5);
+        backRight.setPower(-0.5);
+
+        // Run for the specified time
+        sleep((long) (timeInSeconds * 1000));
+
+        // Stop all motion
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void turnL(double timeInSeconds) {
+        // Set power for a left turn (left side backward, right side forward)
+        frontLeft.setPower(-0.5);
+        frontRight.setPower(0.5);
+        backLeft.setPower(-0.5);
+        backRight.setPower(0.5);
+
+        // Run for the specified time
+        sleep((long) (timeInSeconds * 1000));
+
+        // Stop all motion
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void mse(double timeInSeconds) {
+        // Set power for the ms motor
+        ms.setPower(-1);
+
+        // Run for the specified time
+        sleep((long) (timeInSeconds * 1000));
+
+        // Stop all motion
+        ms.setPower(0);
+    }
+
+    private void msr(double timeInSeconds) {
+        // Set power for a right turn (left side forward, right side backward)
+        ms.setPower(1);
+
+        sleep((long) (timeInSeconds * 1000));
+
+        // Stop all motion
+        ms.setPower(0);
+    }
+}
