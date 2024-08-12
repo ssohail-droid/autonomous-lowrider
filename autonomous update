@@ -1,0 +1,185 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+
+//the name
+
+@Autonomous(name = "Autonomous3", group = "Examples")
+
+//the end name
+
+public class AutonomousPathWithoutEncoders extends LinearOpMode {
+
+    // Das tell code this names exseace
+
+    private DcMotor frontLeft, frontRight, backLeft, backRight;
+    private DcMotor ms;
+    private Servo myServo = null;
+    private Servo s2 = null;
+    private Servo s3 = null;
+    private static final double MOTOR_RUN_DURATION = 2.0;
+
+    // end Das tell code this names exseace
+
+    @Override
+    public void runOpMode() {
+
+        // Das hardwareMap moter names
+
+        frontLeft = hardwareMap.dcMotor.get("front_Right");
+        frontRight = hardwareMap.dcMotor.get("front_Left");
+        backLeft = hardwareMap.dcMotor.get("back_Right");
+        backRight = hardwareMap.dcMotor.get("back_Left");
+        ms = hardwareMap.get(DcMotor.class, "ms");
+        myServo = hardwareMap.get(Servo.class, "s1");
+        s2 = hardwareMap.get(Servo.class, "s2");
+        s3 = hardwareMap.get(Servo.class, "s3");
+
+        // Das hardwareMap moter names
+
+        // das set Direction cause this thing does not know what is a moter
+
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        // end das set Direction cause this thing does not know what is a moter
+
+        // das set Direction cause this thing does not know what is a serov
+
+        myServo.setPosition(0);
+        s2.setPosition(0);
+        s3.setPosition(0.28);
+
+        // end das set Direction cause this thing does not know what is a serov
+
+        // the star of strps
+
+        waitForStart();
+
+        // plz go Straight
+        moveStraight(2.5);
+
+        // plz Right
+        turnRight(0.6);
+
+        // multi Thread ting that i dont know how it work but coffe good
+        Thread msThread = new Thread(() -> mse(MOTOR_RUN_DURATION));
+        msThread.start();
+
+        //move Straight as it sayes
+        moveStraight(3);
+
+        // multi Thread ting that i dont know how it work but coffe good
+        Thread servoThread = new Thread(() -> moveServoAndHolds1(s2, 0.28, 2));
+        servoThread.start();
+
+        // multi Thread ting that i dont know how it work but coffe good
+        Thread servoThreads3 = new Thread(() -> moveServoAndHolds2(s3, 0, 2));
+        servoThreads3.start();
+
+        // multi Thread ting that i dont know how it work but coffe good
+        Thread servoThreads2 = new Thread(() -> moveServoAndHold(myServo, 0.28, 3));
+        servoThreads2.start();
+
+        // multi Thread ting that i dont know how it work but coffe good
+        Thread msrThread = new Thread(() -> msr(MOTOR_RUN_DURATION));
+        msrThread.start();
+
+        //moveStraight
+        moveStraight(3);
+
+        //turn left
+        turnL(0.8);
+
+        //moveStraightback
+        moveStraightback(2.5);
+
+        // if it work dont qus it
+        myServo.setPosition(0.28);
+    }
+
+    // the end of strps
+
+
+    //all private void
+    private void moveServoAndHolds2(Servo servo, double position, double holdTimeInSeconds) {
+        servo.setPosition(position);
+        sleep((long) (holdTimeInSeconds * 1000));
+    }
+
+    private void moveServoAndHold(Servo servo, double position, double holdTimeInSeconds) {
+        servo.setPosition(position);
+        sleep((long) (holdTimeInSeconds * 1000));
+    }
+
+    private void moveServoAndHolds1(Servo servo, double position, double holdTimeInSeconds) {
+        servo.setPosition(position);
+        sleep((long) (holdTimeInSeconds * 1000));
+    }
+
+    private void moveStraight(double timeInSeconds) {
+        frontLeft.setPower(0.3);
+        frontRight.setPower(0.3);
+        backLeft.setPower(0.3);
+        backRight.setPower(0.3);
+        sleep((long) (timeInSeconds * 1000));
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void moveStraightback(double timeInSeconds) {
+        frontLeft.setPower(-0.3);
+        frontRight.setPower(-0.3);
+        backLeft.setPower(-0.3);
+        backRight.setPower(-0.3);
+        sleep((long) (timeInSeconds * 1000));
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void turnRight(double timeInSeconds) {
+        frontLeft.setPower(0.5);
+        frontRight.setPower(-0.5);
+        backLeft.setPower(0.5);
+        backRight.setPower(-0.5);
+        sleep((long) (timeInSeconds * 1000));
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void turnL(double timeInSeconds) {
+        frontLeft.setPower(-0.5);
+        frontRight.setPower(0.5);
+        backLeft.setPower(-0.5);
+        backRight.setPower(0.5);
+        sleep((long) (timeInSeconds * 1000));
+        frontLeft.setPower(0);
+        frontRight.setPower(0);
+        backLeft.setPower(0);
+        backRight.setPower(0);
+    }
+
+    private void mse(double timeInSeconds) {
+        ms.setPower(-1);
+        sleep((long) (timeInSeconds * 1000));
+        ms.setPower(0);
+    }
+
+    private void msr(double timeInSeconds) {
+        ms.setPower(1);
+        sleep((long) (timeInSeconds * 1000));
+        ms.setPower(0);
+
+        // end all private void
+    }
+}
